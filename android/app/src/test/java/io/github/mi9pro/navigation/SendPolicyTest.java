@@ -51,4 +51,11 @@ public class SendPolicyTest {
         assertEquals(500, policy.nextReadDelay(9000));
     }
 
+    @org.junit.Test public void idleHasNoPollWhileActiveAndReadFailuresRecover() {
+        SendPolicy policy = new SendPolicy();
+        org.junit.Assert.assertEquals(-1, policy.pollDelay("idle", 1000));
+        org.junit.Assert.assertEquals(-1, policy.pollDelay("ended", 1000));
+        org.junit.Assert.assertEquals(8000, policy.pollDelay("active", 1000));
+        org.junit.Assert.assertEquals(60000, policy.pollDelay("unavailable", 1000));
+    }
 }

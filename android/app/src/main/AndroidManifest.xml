@@ -18,7 +18,7 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:label="腕上导航"
+        android:label="腕上高德"
         android:icon="@drawable/ic_navigation"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Material.NoActionBar">

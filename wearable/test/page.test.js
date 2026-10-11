@@ -17,6 +17,7 @@ function launch(options = {}) {
   const sent = [];
   const pending = [];
   const screenRequests = [];
+  const vibrations = [];
   const screenCallbacks = [];
   const stored = [];
   let storageRead;
@@ -37,6 +38,7 @@ function launch(options = {}) {
     setTimeout: (callback, delay) => { tick = callback; due = now + delay; return 1; },
     clearTimeout: () => { tick = null; },
     require(name) {
+      if (name === '@system.vibrator') return { vibrate: ({ mode }) => vibrations.push(mode) };
       if (name === '@system.storage') {
         if (options.storageMissing) throw new Error('storage unavailable');
         return { get(callbacks) {
@@ -70,7 +72,7 @@ function launch(options = {}) {
   const definition = context.module.exports;
   const page = Object.assign({}, definition.private, definition);
   page.onInit();
-  return { page, connection, sent, pending, screenRequests, screenCallbacks, stored, storageRead: () => storageRead, loads: () => loads,
+  return { page, connection, sent, pending, vibrations, screenRequests, screenCallbacks, stored, storageRead: () => storageRead, loads: () => loads,
     advance(ms) { now += ms; if (tick && now >= due) { const run = tick; tick = null; timerRuns++; run(); } },
     timerRuns: () => timerRuns, running: () => !!tick };
 }
@@ -333,22 +335,22 @@ test('font selection, typography and defaults survive storage and every display 
   app.page.onReady(); app.page.onShow();
   assert.equal(app.page.arrowSize, 78, 'upgrades preserve user adjustments');
   app.page.openSettings(); app.page.openFonts();
-  app.page.selectFont('kai');
-  assert.equal(app.page.fontFamily, 'BandKai');
+  app.page.selectFont('default');
+  assert.equal(app.page.fontFamily, 'sans-serif');
   assert.equal(app.page.fontPickerOpen, false);
   app.page.adjust('fontSize', 14);
-  assert.equal(app.stored.at(-1).font, 'kai', 'size adjustment must not reset the font');
+  assert.equal(app.stored.at(-1).font, 'default', 'size adjustment must not reset the font');
   assert.equal(app.page.fontSize, 44);
-  assert.equal(app.page.labelSize, 35);
-  assert.equal(app.page.hintSize, 32);
+  assert.equal(app.page.labelSize, 24);
+  assert.equal(app.page.hintSize, 22);
   assert.equal(app.page.titleHeight, 62);
   const restored = launch({ settings: JSON.stringify(app.stored.at(-1)) });
   restored.page.onReady();
-  assert.equal(restored.page.fontFamily, 'BandKai');
+  assert.equal(restored.page.fontFamily, 'sans-serif');
   assert.equal(restored.page.fontSize, 44);
   app.page.closeSettings();
   app.connection.onmessage({ data: JSON.stringify(navigation(1)) });
-  assert.equal(app.page.guidanceFontFamily, 'BandKai');
+  assert.equal(app.page.guidanceFontFamily, 'sans-serif');
   app.connection.onmessage({ data: JSON.stringify({ ...navigation(2), rawText: '直行到𠮷🚦路口' }) });
   assert.equal(app.page.guidanceFontFamily, 'sans-serif');
   assert.equal(app.page.guidanceLines.join(''), '直行到𠮷🚦路口');
@@ -357,7 +359,34 @@ test('font selection, typography and defaults survive storage and every display 
   assert.equal(app.page.fontPickerOpen, false);
   assert.equal(app.page.settingsOpen, true);
   app.page.resetSettings();
-  assert.deepEqual(app.stored.at(-1), { font: 'default', fontSize: 30, arrowSize: 42, arrowWeight: 8 });
+  assert.deepEqual(app.stored.at(-1), { font: 'default', fontSize: 30, arrowSize: 96, arrowWeight: 8 });
   app.page.onBackPress();
   assert.equal(app.page.settingsOpen, false);
+});
+
+ test('native vibration is event-driven and suppressed while hidden', () => {
+  const app = launch({ connected: true });
+  app.page.onReady(); app.page.onShow();
+  const send = (seq, distance) => app.connection.onmessage({ data: JSON.stringify({ ...navigation(seq), distance }) });
+  send(1, '50 米'); send(2, '40 米'); send(3, '40 米');
+  assert.deepEqual(app.vibrations, ['short']);
+  app.page.onHide(); send(4, '150 米'); send(5, '30 米');
+  assert.deepEqual(app.vibrations, ['short']);
+  app.page.onShow(); send(6, '30 米');
+  assert.deepEqual(app.vibrations, ['short']);
+});
+
+ test('only a real navigation ending exits the foreground app, never disconnect or idle', () => {
+  const app = launch({ connected: true });
+  let exits = 0;
+  app.page.$app = { exit() { exits++; } };
+  app.page.onReady(); app.page.onShow();
+  const send = (seq, status) => app.connection.onmessage({ data: JSON.stringify({ ...navigation(seq), status }) });
+  send(1, 'ended'); assert.equal(exits, 0);
+  send(2, 'demo'); send(3, 'ended'); assert.equal(exits, 0);
+  send(4, 'active'); send(5, 'idle'); assert.equal(exits, 0);
+  app.connection.onclose({}); assert.equal(exits, 0);
+  send(6, 'active'); send(7, 'ended'); assert.equal(exits, 1);
+  assert.equal(app.screenRequests.at(-1), false);
+  send(8, 'ended'); assert.equal(exits, 1);
 });

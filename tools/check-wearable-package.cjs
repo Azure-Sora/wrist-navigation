@@ -106,27 +106,14 @@ for (let i = 0; i < 6; i++) click('increase', byClass(page.template(page), 'font
 assert.equal(page.fontSize, 36);
 assert.equal(saved.at(-1).fontSize, 36);
 assert.equal(page.versionName, manifest.versionName);
-click('font-selector');
-assert.equal(page.fontPickerOpen, true);
-assert.equal(byClass(page.template(page), 'settings-list'), null);
-const fontChoices = byClass(page.template(page), 'font-options').children;
-for (let i = 1; i <= 3; i++) {
-  if (!page.fontPickerOpen) click('font-selector');
-  click('font-choice', byClass(page.template(page), 'font-options').children[i]);
-  assert.equal(page.font, ['default', 'song', 'kai', 'round'][i]);
-  assert.equal(saved.at(-1).font, page.font);
-  assert.equal(page.fontPickerOpen, false);
-  const family = page.fontFamily;
-  assert.ok(archive.getEntry('common/fonts/' + family + '.ttf'));
-  assert.ok(archive.getEntry('common/fonts/' + family + '-OFL.txt'));
-  assert.ok(styles[family].fontface, 'compiled font-face definition: ' + family);
-  assert.ok(archive.readFile('common/fonts/' + family + '.ttf').equals(
-    fs.readFileSync(path.join(project, 'wearable/src/common/fonts', family + '.ttf'))));
-}
+assert.equal(page.font, 'default');
+assert.equal(page.fontFamily, 'sans-serif');
+assert.ok(!archive.getEntries().some(entry => /\.ttf$/i.test(entry.entryName)), 'Band 9 package must not include large custom fonts');
+assert.ok(fs.statSync(rpk).size < 1024 * 1024, 'Band 9 package budget is 1 MiB');
 click('reset-defaults');
 assert.equal(page.font, 'default');
 assert.equal(page.fontSize, 30);
-assert.equal(page.arrowSize, 42);
+assert.equal(page.arrowSize, 96);
 assert.equal(page.arrowWeight, 8);
 click('back');
 assert.equal(byClass(page.template(page), 'settings'), null);
@@ -142,4 +129,4 @@ for (let weight = 4; weight <= 10; weight++) {
 }
 page.onDestroy();
 assert.deepEqual(screenRequests, [true, false, true, false, true, false, true, false, true, false]);
-console.log('RPK ' + manifest.versionName + ': startup, compiled click handlers, font choices/resources, exclusive page trees, settings persistence/reset, navigation, screen lifecycle and assets passed.');
+console.log('RPK ' + manifest.versionName + ': startup, compiled click handlers, system font/resource budget, exclusive page trees, settings persistence/reset, navigation, screen lifecycle and assets passed.');

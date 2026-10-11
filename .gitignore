@@ -32,3 +32,6 @@ __pycache__/
 Thumbs.db
 *.zip
 *.7z
+
+.codegraph/
+.playwright-cli/

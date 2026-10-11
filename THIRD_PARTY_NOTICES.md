@@ -2,15 +2,9 @@
 
 项目根目录的 [MIT 许可证](LICENSE) 适用于原创代码和文档。以下内容保留各自许可，不因本项目开源而重新授权。
 
-## 随源码提供的字体
+## 上游字体历史
 
-| 文件/家族 | 上游 | 许可与版权声明 |
-| --- | --- | --- |
-| `BandSong.ttf` / BandSong | [ZCOOL XiaoWei](https://github.com/google/fonts/tree/main/ofl/zcoolxiaowei) | [SIL OFL 1.1 与原作者声明](wearable/src/common/fonts/BandSong-OFL.txt) |
-| `BandKai.ttf` / BandKai | [LXGW WenKai Lite v1.522](https://github.com/lxgw/LxgwWenKai-Lite/releases/tag/v1.522) | [SIL OFL 1.1、保留字体名称及附加许可](wearable/src/common/fonts/BandKai-OFL.txt) |
-| `BandRound.ttf` / BandRound | [ZCOOL QingKe HuangYou](https://github.com/google/fonts/tree/main/ofl/zcoolqingkehuangyou) | [SIL OFL 1.1 与原作者声明](wearable/src/common/fonts/BandRound-OFL.txt) |
-
-这些文件由 `tools/prepare-band-fonts.py` 制作子集并改名，保留原始版权与许可记录；上游哈希及修改范围见 [字体实现记录](docs/display-settings-024.md)。完整许可随字体和 RPK 一同提供。未分发电脑自带的宋体、楷体或圆体字库。
+本fork从0.3.1起移除BandSong、BandKai、BandRound字体及覆盖表，不再随当前源码/手环包提供，使用固件系统字体。历史提交中的字体仍适用随该提交保存的SIL OFL许可与原作者声明，详见[历史字体记录](docs/display-settings-024.md)。
 
 ## Gradle Wrapper
 

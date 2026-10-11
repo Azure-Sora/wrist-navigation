@@ -34,6 +34,7 @@
     }
     function unschedule(id) { window.clearTimeout(id); timer = null; expire = null; }
     function requireModule(name) {
+      if (name === '@system.vibrator') return { vibrate: cb => events.push({ vibration: cb.mode }) };
       if (name === '@system.storage') return storage;
       if (name === '@system.interconnect') return { instance: () => connection };
       if (name === '@system.brightness') return { setKeepScreenOn: cb => screenRequests.push(cb.keepScreenOn) };
@@ -113,7 +114,7 @@
       const active = ['active', 'long', 'expired'].includes(next);
       connection.onmessage({ data: JSON.stringify({ v: 1, type: 'navigation', session: 'browser-only', seq: ++seq,
         status: active ? 'active' : next, title: '高德地图', maneuver: next === 'long' ? 'right' : 'straight',
-        distance: active ? '200 米' : '', instruction: active ? '直行' : '',
+        distance: next === 'long' ? '1.2 公里' : active ? '200 米' : '', instruction: active ? '直行' : '',
         rawText: next === 'long' ? '前方1.2公里右转进入示例道路，请注意路况并继续查看完整指引' : active ? '直行200米\n高德导航中' : '' }) });
       if (next === 'expired') advance(20000);
       render();

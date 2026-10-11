@@ -1,9 +1,9 @@
 {
-  "package": "io.github.mi9pro.navigation",
-  "name": "腕上导航",
-  "icon": "/common/icon.png",
-  "versionName": "0.2.4",
-  "versionCode": 9,
+  "package": "io.github.azuresora.wristamap",
+  "name": "腕上高德",
+  "icon": "/common/launcher96.png",
+  "versionName": "0.3.3",
+  "versionCode": 13,
   "minAPILevel": 1,
   "deviceTypeList": [
     "watch"
@@ -17,10 +17,13 @@
     },
     {
       "name": "system.storage"
+    },
+    {
+      "name": "system.vibrator"
     }
   ],
   "config": {
-    "designWidth": 336,
+    "designWidth": 192,
     "logLevel": "error"
   },
   "display": {

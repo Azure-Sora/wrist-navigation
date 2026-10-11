@@ -60,23 +60,14 @@ test('guidance uses the full original instruction and preserves long text at eve
   for (let fontSize = 24; fontSize <= 44; fontSize++) {
     const layout = presentation.navigationLayout(view, { ...settings.DEFAULTS, fontSize }, '');
     assert.equal(layout.guidanceLines.join(''), raw.replace(/\n/g, ''));
-    assert.ok(layout.guidanceLines.every(row => Array.from(row).length <= Math.floor(288 / fontSize)));
+    assert.ok(layout.guidanceLines.every(row => Array.from(row).length <= Math.floor(168 / fontSize)));
     assert.ok(layout.guidanceHeight <= 166);
   }
 });
 
-test('bundled fonts cover UI text and missing glyphs retain the original system fallback', () => {
-  const fs = require('node:fs');
-  const path = require('node:path');
-  for (const id of settings.FONTS) {
-    assert.equal(settings.normalize({ font: id }).font, id);
-    const option = settings.fontOption(id);
-    assert.equal(settings.fontForText(id, '直行200米等待导航显示设置文字大小箭头粗细恢复默认'), option.family);
-    assert.equal(settings.fontForText(id, '路口𠮷🚦'), 'sans-serif');
-    if (id === 'default') continue;
-    const directory = path.join(__dirname, '../src/common/fonts');
-    const bytes = fs.readFileSync(path.join(directory, option.family + '.ttf'));
-    assert.equal(bytes.readUInt32BE(), 0x00010000, 'real TrueType resource');
-    assert.match(fs.readFileSync(path.join(directory, option.family + '-OFL.txt'), 'utf8'), /SIL OPEN FONT LICENSE/);
+test('legacy custom font preferences fall back to firmware fonts', () => {
+  for (const font of ['song', 'kai', 'round', 'default']) {
+    assert.equal(settings.normalize({ font }).font, 'default');
+    assert.equal(settings.fontForText(font, '路口𠮷🚦'), 'sans-serif');
   }
 });

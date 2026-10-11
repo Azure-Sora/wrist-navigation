@@ -1,6 +1,6 @@
 # 开发环境与首次检出
 
-项目不绑定开发电脑。仓库可放在任意目录；界面预览和 JavaScript 测试不依赖手机、手环、原签名或 Android SDK。运行端目前适配 Android 手机 + 小米手环 9 Pro，其他穿戴设备尚未适配。
+项目不绑定开发电脑。仓库可放在任意目录；界面预览和 JavaScript 测试不依赖手机、手环、原签名或 Android SDK。本fork适配 Android 手机 + 国行普通版小米手环9，双端0.3.3；上游9 Pro历史不代表本fork验证。
 
 首次使用安装包请看 [首次使用](getting-started.md)，参与开发请看 [贡献指南](../CONTRIBUTING.md)。公开源码不包含私有签名和本地 `outputs/` 安装包。
 
@@ -62,9 +62,9 @@ node tools/check-wearable-package.cjs
 
 依赖由 wearable/package-lock.json 锁定（aiot-toolkit 2.0.5）。prebuild 在缺少原手环证书时停止，避免 toolkit 回退到自带证书；start 和 release 也有签名前置检查。检查确认文件完整和密钥配对，不代替 APK/RPK 身份一致性及真机验证。发布包需另按 toolkit 约定恢复原发布签名，并与 debug 证书保持同一身份。
 
-RPK 输出为 wearable/dist/io.github.mi9pro.navigation.debug.0.2.4.rpk。可使用 `node tools/verify-rpk-signature.cjs wearable/dist/io.github.mi9pro.navigation.debug.0.2.4.rpk` 检查包内签名与摘要。仅通过 AstroBox「快应用」安装至手环，方法见 [安装指南](band-install.md)。手机 APK 与手环 RPK 不可互换。
+RPK 输出为 wearable/dist/io.github.azuresora.wristamap.debug.0.3.3.rpk。可使用 `node tools/verify-rpk-signature.cjs wearable/dist/io.github.azuresora.wristamap.debug.0.3.3.rpk` 检查包内签名与摘要。仅通过 AstroBox「快应用」安装至手环，方法见 [安装指南](band-install.md)。手机 APK 与手环 RPK 不可互换。
 
-0.2.4 附加字体 TTF、许可和字符覆盖信息已经放入 wearable/src/common/，普通开发与打包仍只需 Node.js，不读取电脑安装字体。只有重新制作字体子集才需要 Python/fontTools 和原字体文件；来源、哈希及重建方式见 [显示设置记录](display-settings-024.md)。
+本fork从0.3.1起不打包自定义TTF与覆盖表，只使用固件系统字体。tools/prepare-band-fonts.py和独立/settings页面保留为上游研究工具/原型，不代表当前手环功能；不要运行字体生成工具给当前版本重新引入大字体资源。实际手环界面请使用根路径源码预览。
 
 ## 真机联调
 

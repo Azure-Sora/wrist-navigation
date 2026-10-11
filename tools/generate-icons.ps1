@@ -1,3 +1,4 @@
+param([switch]$LauncherOnly)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 $taskRoot = Split-Path -Parent $PSScriptRoot
@@ -5,7 +6,9 @@ $taskOut = Join-Path $taskRoot 'wearable\src\common'
 New-Item -ItemType Directory -Force -Path $taskOut | Out-Null
 $taskMint = [Drawing.ColorTranslator]::FromHtml('#80f5be')
 foreach ($taskName in @('left','right','straight','slight_left','slight_right','sharp_left','sharp_right','uturn','roundabout','arrive','unknown','icon')) {
-    $taskBitmap = [Drawing.Bitmap]::new(192,192)
+    if ($LauncherOnly -and $taskName -ne 'icon') { continue }
+    $taskSize = if ($taskName -eq 'icon') { 96 } else { 192 }
+    $taskBitmap = [Drawing.Bitmap]::new($taskSize,$taskSize)
     $taskGraphics = [Drawing.Graphics]::FromImage($taskBitmap)
     $taskGraphics.SmoothingMode = [Drawing.Drawing2D.SmoothingMode]::AntiAlias
     $taskPen = [Drawing.Pen]::new($taskMint,16)
@@ -14,8 +17,12 @@ foreach ($taskName in @('left','right','straight','slight_left','slight_right','
     $taskPen.LineJoin = [Drawing.Drawing2D.LineJoin]::Round
     $taskBrush = [Drawing.SolidBrush]::new($taskMint)
     if ($taskName -eq 'icon') {
-        $taskGraphics.Clear([Drawing.ColorTranslator]::FromHtml('#0c141d'))
-        $taskGraphics.FillPolygon($taskBrush, [Drawing.PointF[]]@([Drawing.PointF]::new(96,20),[Drawing.PointF]::new(160,166),[Drawing.PointF]::new(96,132),[Drawing.PointF]::new(32,166)))
+        $taskGraphics.ScaleTransform(0.5,0.5)
+        $taskGraphics.Clear([Drawing.Color]::Transparent)
+        $taskBackground = [Drawing.SolidBrush]::new([Drawing.ColorTranslator]::FromHtml('#183c30'))
+        $taskGraphics.FillEllipse($taskBackground,0,0,192,192)
+        $taskBackground.Dispose()
+        $taskGraphics.FillPolygon($taskBrush, [Drawing.PointF[]]@([Drawing.PointF]::new(96,38),[Drawing.PointF]::new(145,150),[Drawing.PointF]::new(96,124),[Drawing.PointF]::new(47,150)))
     } elseif ($taskName -eq 'unknown') {
         $taskGraphics.DrawEllipse($taskPen,32,32,128,128)
         $taskGraphics.DrawLine($taskPen,96,90,96,130)
@@ -49,7 +56,8 @@ foreach ($taskName in @('left','right','straight','slight_left','slight_right','
             }
         }
     }
-    $taskBitmap.Save((Join-Path $taskOut "$taskName.png"),[Drawing.Imaging.ImageFormat]::Png)
+    $taskFileName = if ($taskName -eq 'icon') { 'launcher96.png' } else { "$taskName.png" }
+    $taskBitmap.Save((Join-Path $taskOut $taskFileName),[Drawing.Imaging.ImageFormat]::Png)
     $taskBrush.Dispose(); $taskPen.Dispose(); $taskGraphics.Dispose(); $taskBitmap.Dispose()
 }
 Write-Output 'Generated navigation icons from drawing primitives.'

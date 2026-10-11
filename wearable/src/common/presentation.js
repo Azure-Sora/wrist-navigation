@@ -1,4 +1,4 @@
-// Fixed-height list rows must each fit one line on the 336px Band 9 Pro display.
+// Fixed-height list rows must each fit one line on the 192px Band 9 display.
 // Use a conservative full-width character budget, preserving surrogate pairs.
 function lines(text, budget) {
   const limit = typeof budget === 'number' && isFinite(budget) && budget > 0 ? Math.max(1, Math.floor(budget)) : 14;
@@ -47,7 +47,7 @@ function layout(view) {
   const distance = String(view.distance || '').trim();
   const parts = distance.match(/^(\d+(?:\.\d+)?)\s*(公里|千米|米|km|m)$/i);
   const value = parts ? parts[1] : distance.length <= 6 ? distance : '';
-  const size = value.length <= 3 ? 72 : value.length <= 5 ? 52 : value.length <= 8 ? 32 : 24;
+  const size = value.length <= 3 ? 56 : value.length <= 5 ? 42 : value.length <= 8 ? 28 : 20;
   let extra = details(view);
   // Long/unrecognised fields remain readable in the scrollable text area.
   const overflow = [];
@@ -92,20 +92,20 @@ function navigationLayout(view, settings, warning) {
   const rowHeight = Math.ceil(size * 1.4);
   let text = navigationText(view);
   if (warning) text += (text ? '\n' : '') + warning;
-  const rows = lines(text, Math.floor(288 / size));
-  const guidanceHeight = Math.min(166, 288 - settings.arrowSize - 26, rows.length * rowHeight);
-  const contentHeight = settings.arrowSize + 26 + guidanceHeight;
+  const rows = lines(text, Math.floor(168 / size));
+  const guidanceHeight = Math.min(140, 340 - settings.arrowSize - 106, rows.length * rowHeight);
+  const contentHeight = settings.arrowSize + 106 + guidanceHeight;
   return { guidanceLines: rows, rowHeight, guidanceHeight, contentHeight,
-    contentTop: (480 - contentHeight) / 2, arrowLeft: (288 - settings.arrowSize) / 2,
-    guidanceTop: settings.arrowSize + 26 };
+    contentTop: 64, arrowLeft: (168 - settings.arrowSize) / 2,
+    guidanceTop: settings.arrowSize + 106 };
 }
 
 // All three screens share one type scale. Bigger settings scroll instead of
 // squeezing controls or silently ignoring the user's chosen font size.
 function typography(fontSize) {
-  const labelSize = Math.round(fontSize * 0.8);
-  const hintSize = Math.round(fontSize * 0.72);
-  const auxiliarySize = Math.round(fontSize * 0.6);
+  const labelSize = Math.min(24, Math.round(fontSize * 0.8));
+  const hintSize = Math.min(22, Math.round(fontSize * 0.72));
+  const auxiliarySize = Math.min(18, Math.round(fontSize * 0.6));
   const titleHeight = Math.ceil(fontSize * 1.4);
   const labelHeight = Math.ceil(labelSize * 1.16);
   const hintHeight = Math.ceil(hintSize * 1.4);
@@ -120,7 +120,8 @@ function typography(fontSize) {
 }
 
 function restLayout(view, warning, settings) {
-  const type = typography(settings ? settings.fontSize : 30);
+  const restFontSize = Math.min(32, settings ? settings.fontSize : 30);
+  const type = typography(restFontSize);
   const hints = {
     '等待连接': ['请在手机上连接', '小米运动健康'],
     '等待导航': ['在高德开始导航', '指引将在这里显示'],
@@ -131,20 +132,20 @@ function restLayout(view, warning, settings) {
     '连接不可用': ['请在手机上', '重新连接手环'],
     '通知读取不可用': ['请检查手机的', '通知使用权']
   };
-  const hintLines = (hints[view.status] || []).reduce((all, text) => all.concat(lines(text, Math.floor(288 / type.hintSize))), []);
-  const titleLines = lines(view.status, Math.floor(288 / (settings ? settings.fontSize : 30)));
+  const hintLines = (hints[view.status] || []).reduce((all, text) => all.concat(lines(text, Math.floor(168 / type.hintSize))), []);
+  const titleLines = lines(view.status, Math.floor(168 / restFontSize));
   const restTitleHeight = titleLines.length * type.titleHeight;
   const hintTop = restTitleHeight + 12;
   const hintsHeight = hintLines.length * type.hintHeight;
   const text = [details(view), warning].filter(Boolean).join('\n');
-  const rawLines = text ? lines(text, Math.floor(288 / type.hintSize)) : [];
+  const rawLines = text ? lines(text, Math.floor(168 / type.hintSize)) : [];
   const detailsTop = restTitleHeight + (hintLines.length ? 12 + hintsHeight : 0) + (text ? 16 : 0);
   // Keep even the longest status/error above the bottom gear. All error rows
   // remain in a scrollable list, including at the largest global font size.
-  const detailsHeight = Math.min(84, Math.max(type.hintHeight, 288 - detailsTop), rawLines.length * type.hintHeight);
+  const detailsHeight = Math.min(84, Math.max(type.hintHeight, 340 - detailsTop), rawLines.length * type.hintHeight);
   const restHeight = detailsTop + detailsHeight;
-  return { titleLines, restTitleHeight, hintTop, hintsHeight, hintLines, rawLines, hasDetails: !!text, detailsTop, detailsHeight, restHeight,
-    restTop: (480 - restHeight) / 2 };
+  return { restFontSize, restTitleLineHeight: type.titleHeight, titleLines, restTitleHeight, hintTop, hintsHeight, hintLines, rawLines, hasDetails: !!text, detailsTop, detailsHeight, restHeight,
+    restTop: (490 - restHeight) / 2 };
 }
 
 module.exports = { lines, errorText, details, layout, navigationText, navigationLayout, restLayout, typography };

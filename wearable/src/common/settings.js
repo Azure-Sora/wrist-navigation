@@ -1,31 +1,11 @@
 const KEY = 'navigation.display.v1';
-const FONT_COVERAGE = require('./font-coverage');
-const DEFAULTS = { font: 'default', fontSize: 30, arrowSize: 42, arrowWeight: 8 };
+const DEFAULTS = { font: 'default', fontSize: 30, arrowSize: 96, arrowWeight: 8 };
 const LIMITS = { fontSize: [24, 44], arrowSize: [32, 100], arrowWeight: [4, 10] };
-const FONTS = ['default', 'song', 'kai', 'round'];
-const FONT_OPTIONS = [
-  { id: 'default', name: '系统默认', family: 'sans-serif' },
-  { id: 'song', name: '宋体', family: 'BandSong' },
-  { id: 'kai', name: '楷体', family: 'BandKai' },
-  { id: 'round', name: '圆体', family: 'BandRound' }
-];
-
-function fontOption(id) {
-  return FONT_OPTIONS[FONTS.indexOf(id)] || FONT_OPTIONS[0];
-}
-
-// An uncommon road name or emoji must not disappear because of a font subset.
-// Fall back for the whole text block, retaining the notification verbatim.
-function fontForText(id, text) {
-  const coverage = FONT_COVERAGE[id];
-  if (!coverage) return 'sans-serif';
-  for (const character of String(text || '')) {
-    const point = character.codePointAt(0);
-    if (point === 10 || point === 13) continue;
-    if (point >= 65536 || !(parseInt(coverage.charAt(point >> 2), 16) & (1 << (point & 3)))) return 'sans-serif';
-  }
-  return fontOption(id).family;
-}
+const FONTS = ['default'];
+const FONT_OPTIONS = [{ id: 'default', name: '系统默认', family: 'sans-serif' }];
+function fontOption() { return FONT_OPTIONS[0]; }
+// Use the firmware font; do not unpack multi-megabyte TTFs on Band 9.
+function fontForText() { return 'sans-serif'; }
 
 function normalize(value) {
   const input = value && typeof value === 'object' && !Array.isArray(value) ? value : {};

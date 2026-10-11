@@ -1,3 +1,5 @@
+> 上游历史文档。当前普通手环9 fork双端为0.3.3，包名io.github.azuresora.wristamap；安装和当前证据以[首次使用](getting-started.md)及[适配记录](band9-adaptation.md)为准。以下旧版本、签名、下载链接及字体结论不适用于当前fork。
+
 # 手环安装与更新
 
 首次使用需同时配置手机端，见 [首次使用](getting-started.md)。当前配套文件为手机 `NAV-PHONE-021.apk` 和手环 `NAV-BAND-024.rpk`，从 [GitHub Releases](https://github.com/Gu-Mie/wrist-navigation/releases) 获取。

@@ -1,67 +1,39 @@
-# 腕上导航 · 小米手环 9 Pro
-本项目仅供学习、研究与技术交流。如有问题，请联系邮箱 2858005527@qq.com
+# WristAMap · 腕上高德
 
-把 Android 高德地图的导航通知同步到小米手环 9 Pro，在手腕上查看转向和完整指引。
+把 Android 高德地图的导航通知同步到**国行普通版小米手环 9**。基于 [Gu-Mie/wrist-navigation](https://github.com/Gu-Mie/wrist-navigation) 的独立 fork，针对 192×490 胶囊屏适配。
 
-个人开发的实验性项目，与高德、小米或 AstroBox 无隶属关系。当前配套版本：**手机 0.2.1 / 手环 0.2.4**，首次公开作为测试版提供。
-
-[下载安装包](https://github.com/Gu-Mie/wrist-navigation/releases) · [首次使用](docs/getting-started.md) · [开发指南](docs/development.md) · [更新记录](CHANGELOG.md) · [隐私说明](PRIVACY.md)
-
-![手环导航、等待与设置页面的浏览器源码预览](docs/images/wearable-native-024.png)
-
-上图使用虚构数据，是当前源码的浏览器预览，并非真机截图。
+当前配套版本：**手机 0.3.3 / 手环 0.3.3**。用户已确认当前功能正常，包括前序确认的自动打开、手机亮屏/锁屏同步和通知隐藏；没有完成定时耗电与长期后台测试。详细范围见 [适配与验证记录](docs/band9-adaptation.md)。
 
 ## 功能
 
-- 查看转向箭头与完整高德通知，长内容可滚动；保留无法识别的原文，不计算或编造路线。
-- 高德开始导航时请求打开手环页面，按一次导航控制，减少重复抢回前台。
-- 导航页在前台、指引有效时可保持亮屏；结束、断连、过期或离开页面后释放，手机端可关闭此功能。
-- 手环可选择系统默认、宋体、楷体、圆体，调整字号、箭头大小和粗细，自动保存并支持恢复默认。
-- 手机端提供同步开关、连接授权与后台运行设置。
+- 同步高德步行、骑行通知中的方向、距离与原文，不独立定位或规划路线。
+- 大箭头、大距离显示，转向与临近路口振动；通知没有步骤 ID，提醒使用启发式判断。
+- 导航开始自动打开手环，导航页前台常亮；结束导航后自动退出应用。
+- 支持字号、箭头大小和粗细调整，采用系统字体，避免大字体包造成安装问题。
+- 手机后台同步；本应用通知显示可关闭，读取高德的通知使用权仍需保留。
 
-## 下载与安装
+## 安装
 
-从 [GitHub Releases](https://github.com/Gu-Mie/wrist-navigation/releases) 获取同一次发布的配套文件：
+使用本 fork 同签名配套的 `WristAMap-phone-0.3.3.apk` 与 `WristAMap-band9-0.3.3.rpk`。手机安装 APK，AstroBox 用“快应用”安装 RPK，然后恢复小米运动健康连接。开启手机应用的通知使用权、附近设备权限、互联授权及同步开关。
 
-| 文件 | 用途 |
-| --- | --- |
-| `NAV-PHONE-021.apk` | 安装到 Android 手机 |
-| `NAV-BAND-024.rpk` | 通过 AstroBox「快应用」安装到小米手环 9 Pro |
-| `SHA256SUMS.txt` | 下载文件完整性校验 |
-| `THIRD_PARTY_NOTICES.txt` | 第三方组件及字体许可说明 |
+双端包名为 `io.github.azuresora.wristamap`，不可与上游安装包交叉配对。安装包和私钥不进入 Git；维护者本地产物在 `outputs/releases/band9-0.3.3/`，本次提交不等于发布 GitHub Release。
 
-安装后恢复小米运动健康连接，打开手机腕上导航，授予通知使用权、设备权限及互联授权，开启同步，再在高德开始导航。详细步骤见 [首次使用](docs/getting-started.md)。更新会保留旧设置，可在手环设置底部点「恢复默认」应用字号 30、箭头 42、粗细 8 的比例。
+[首次使用](docs/getting-started.md) · [后台与耗电策略](docs/background-sync.md) · [开发指南](docs/development.md) · [更新记录](CHANGELOG.md) · [文档索引](docs/README.md)
 
-## 适用范围与测试状态
+## 开发
 
-- 手机最低 Android 8.0（API 26），需要高德地图及小米运动健康；实际联调手机为小米 15，其他手机兼容性待验证。
-- 手环按小米手环 9 Pro 的 336 × 480 屏幕适配，其他穿戴设备未验证。
-- 需要手机保持导航与连接，不支持独立定位、路线规划或脱离手机导航。常亮仅用于导航页前台，不是系统 AOD。
-- 用户于 2026-09-22 确认手环 0.2.4 安装使用正常；字体实际加载、所有显示设置、长时间锁屏、重启恢复、ACK 回程及耗电尚未逐项验收。
-- 手机 APK 为原有已签名调试构建。安装包已核对匹配签名及 SHA-256，本地检查不能替代真机验收，见 [验证摘要](docs/navigation-verification.md)。
-
-## 本地开发
-
-安装 Node.js 22+（推荐 24），在项目根目录运行：
+Node.js 22+，根目录无需安装依赖：
 
 ```sh
 npm test
+npm run check:public
 npm run dev
 ```
 
-根目录无需安装 npm 依赖，也无需手机、手环、签名或 Android SDK。打开 <http://127.0.0.1:4173/> 操作实际源码生成的交互预览；原生接口由浏览器模拟。`/settings` 保留独立设置原型。预览输出到本地 `outputs/previews/`。完整构建步骤见 [开发指南](docs/development.md)。
+浏览器预览使用模拟通信，不能替代真机证据。双端构建需另配置 Android SDK、小米互联 SDK 与本 fork 配套签名，见开发指南。
 
-```text
-android/       Android 手机应用及单元测试
-wearable/      Vela 手环应用、字体、图标及测试
-tools/         开发、预览、构建检查与验证工具
-docs/          安装、开发、实现与验证文档
-licenses/      第三方许可文本
-.github/       CI、Issue 与 PR 模板
-```
+## 适用范围与许可
 
-`outputs/`、`.local/`、签名、SDK AAR 和依赖缓存不进入源码仓库。文件公开范围与维护方法见 [发布说明](docs/open-source-release.md)。
+本轮实测手机为 Android 16 / HyperOS 3，高德 17.00.0.2005、运动健康 3.58.0；其他手机与固件待验证。最低 Android 8.0 是构建要求，不代表所有版本实测通过。长期后台、重启恢复、深度 Doze、ACK 回程及定量耗电仍待验证。
 
-## 反馈与许可
-
-欢迎提交 [Issue](https://github.com/Gu-Mie/wrist-navigation/issues) 或小范围 PR，先阅读 [贡献指南](CONTRIBUTING.md)。联系邮箱：[2858005527@qq.com](mailto:2858005527@qq.com)。安全问题请按 [安全说明](SECURITY.md) 私下反馈。
+原创代码沿用 [MIT](LICENSE)，保留上游作者版权；依赖说明见 [第三方声明](THIRD_PARTY_NOTICES.md)，数据处理见 [隐私说明](PRIVACY.md)。本项目与高德、小米或 AstroBox 无隶属关系。

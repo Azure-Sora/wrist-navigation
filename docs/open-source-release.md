@@ -1,3 +1,5 @@
+> 上游历史文档。当前普通手环9 fork双端为0.3.3，包名io.github.azuresora.wristamap；安装和当前证据以[首次使用](getting-started.md)及[适配记录](band9-adaptation.md)为准。以下旧版本、签名、下载链接及字体结论不适用于当前fork。
+
 # 文件公开范围与发布
 
 ## 源码仓库

@@ -197,7 +197,6 @@ public final class MainActivity extends Activity {
         }
         ArrayList<String> permissions = new ArrayList<>();
         if (Build.VERSION.SDK_INT >= 31 && !NavigationSyncService.hasDevicePermission(this)) permissions.add(Manifest.permission.BLUETOOTH_CONNECT);
-        if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) permissions.add(Manifest.permission.POST_NOTIFICATIONS);
         if (!permissions.isEmpty()) { requestPermissions(permissions.toArray(new String[0]), 1); return; }
         NavigationSyncService.start(this);
         NotificationListenerService.requestRebind(new ComponentName(this, NavigationNotificationListener.class));
@@ -219,6 +218,12 @@ public final class MainActivity extends Activity {
         preference(options, "自动打开手环导航", "每次开始导航时打开一次", bridge.autoOpenEnabled(), bridge::setAutoOpenEnabled);
         divider(options, 0);
         preference(options, "导航时手环常亮", "关闭后可减少屏幕耗电", bridge.keepScreenOnEnabled(), bridge::setKeepScreenOnEnabled);
+        divider(options, 0);
+        options.addView(entry("bell", "通知栏显示", "可关闭本应用通知，不影响读取高德导航", view -> {
+            dismissSheet();
+            startActivity(new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName()));
+        }));
         TextView version = label("腕上导航  " + BuildConfig.VERSION_NAME, 12, muted, false);
         options.addView(version, space(-1, -2, 16));
         showSheet(options);

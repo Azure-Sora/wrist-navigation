@@ -1,3 +1,7 @@
+# 当前 fork 约定（2026-10-11，优先于以下上游历史）
+
+用户已授权开发国行普通版手环9，导航全程常亮。阅读 docs/band9-adaptation.md 获取本轮证据。独立APK/RPK包名 io.github.azuresora.wristamap，使用本fork本地配套签名，后续不可轮换。下文关于原作者手机、手环9 Pro、原包名与原签名的内容仅为上游历史，不适用于本fork新身份。不得将历史用户确认写成本设备通过。
+
 # 项目开发约定
 
 本项目把 Android 高德地图导航通知同步到小米手环 9 Pro。与用户使用中文沟通。
@@ -32,7 +36,7 @@
 | 文件 | 作用 |
 | --- | --- |
 | `android/app/src/main/java/io/github/mi9pro/navigation/NavigationParser.java` | 纯 Java 通知文字解析 |
-| 同目录 `NavigationNotificationListener.java` | 通知监听、350 毫秒去抖、活动心跳补读、等待 60 秒兜底 |
+| 同目录 `NavigationNotificationListener.java` | 通知监听、350毫秒去抖、活动8秒心跳补读、空闲无轮询、读取失败60秒重试 |
 | 同目录 `WearBridge.java`、`SendPolicy.java` | XMS 授权、连接、发送去重/节流、手动打开调试、诊断 |
 | 同目录 `MainActivity.java` | 手机设置及诊断页面 |
 | 同目录 `NavigationSyncService.java`、`SyncRestoreReceiver.java` | 后台同步、唤醒锁、停止和恢复 |
